@@ -19,15 +19,27 @@ else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 include_directories( include ../include )
-
+###################### old #########################
 # Find glut
+# find_package(GLUT REQUIRED)
+#include_directories(${GLUT_INCLUDE_DIRS})
+#link_directories(${GLUT_LIBRARY_DIRS})
+#add_definitions(${GLUT_DEFINITIONS})
+#if(NOT GLUT_FOUND)
+#    message(ERROR " GLUT not found!")
+#endif(NOT GLUT_FOUND)
+
+##################### fix ##################
+# GLUT MANUAL OVERRIDE
+if(GLUT_glut_LIBRARY)
+message(STATUS "Using manual GLUT library")
+set(GLUT_FOUND TRUE)
+set(GLUT_LIBRARY ${GLUT_glut_LIBRARY})
+else()
 find_package(GLUT REQUIRED)
+endif()
 include_directories(${GLUT_INCLUDE_DIRS})
-link_directories(${GLUT_LIBRARY_DIRS})
-add_definitions(${GLUT_DEFINITIONS})
-if(NOT GLUT_FOUND)
-    message(ERROR " GLUT not found!")
-endif(NOT GLUT_FOUND)
+####################################################
 
 # Find opengl
 find_package(OpenGL REQUIRED)
