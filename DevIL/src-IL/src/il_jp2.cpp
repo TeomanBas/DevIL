@@ -14,6 +14,13 @@
 #include "il_internal.h"
 #ifndef IL_NO_JP2
 #include <jasper/jasper.h>
+#include <stddef.h>
+
+#if defined(_WIN64)
+typedef long long devil_jas_size_t;
+#else
+typedef int devil_jas_size_t;
+#endif
 #include "il_jp2.h"
 
 #if defined(_WIN32) && defined(IL_USE_PRAGMA_LIBS)
@@ -323,7 +330,8 @@ ILboolean iLoadJp2Internal(jas_stream_t	*Stream, ILimage *Image)
 //
 // see: https://github.com/OSGeo/gdal/commit/9ef8e16e27c5fc4c491debe50bf2b7f3e94ed334
 //      https://github.com/DentonW/DevIL/issues/90
-#if defined(PRIjas_seqent)
+
+/*#if defined(PRIjas_seqent)
 static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 #else
 static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, int cnt)
@@ -332,7 +340,25 @@ static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, int cnt)
 	obj;
 	return iread(buf, 1, cnt);
 }
-
+*/
+static devil_jas_size_t iJp2_file_read(
+    jas_stream_obj_t *obj,
+    char *buf,
+    size_t cnt)
+{
+    obj;
+    return (devil_jas_size_t)iread(buf, 1, (ILuint)cnt);
+}
+#if defined(PRIjas_seqent)
+static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
+#else
+static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, int cnt)
+#endif
+{
+    obj;
+    return iread(buf, 1, cnt);
+}
+/*
 #if defined(JAS_INCLUDE_JP2_CODEC)
 static int iJp2_file_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt)
 #elif defined(PRIjas_seqent)
@@ -344,8 +370,20 @@ static int iJp2_file_write(jas_stream_obj_t *obj, char *buf, int cnt)
 	obj;
 	return iwrite(buf, 1, cnt);
 }
-
-static long iJp2_file_seek(jas_stream_obj_t *obj, long offset, int origin)
+*/
+static devil_jas_size_t iJp2_file_write(
+    jas_stream_obj_t *obj,
+    const char *buf,
+    size_t cnt)
+{
+    obj;
+    return (devil_jas_size_t)iwrite(buf, 1, (ILuint)cnt);
+}
+//static long iJp2_file_seek(jas_stream_obj_t *obj, long offset, int origin)
+static long long iJp2_file_seek(
+    jas_stream_obj_t *obj,
+    long long offset,
+    int origin)
 {
 	obj;
 
@@ -367,12 +405,20 @@ static int iJp2_file_close(jas_stream_obj_t *obj)
 	obj;
 	return 0;  // We choose when we want to close the file.
 }
-
+/*
 static jas_stream_ops_t jas_stream_devilops = {
 	iJp2_file_read,
 	iJp2_file_write,
 	iJp2_file_seek,
 	iJp2_file_close
+};
+*/
+static jas_stream_ops_t jas_stream_devilops =
+{
+    (decltype(jas_stream_devilops.read_))iJp2_file_read,
+    (decltype(jas_stream_devilops.write_))iJp2_file_write,
+    (decltype(jas_stream_devilops.seek_))iJp2_file_seek,
+    (decltype(jas_stream_devilops.close_))iJp2_file_close
 };
 
 static jas_stream_t *jas_stream_create(void);
