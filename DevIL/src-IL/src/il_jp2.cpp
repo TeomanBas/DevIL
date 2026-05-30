@@ -348,7 +348,7 @@ static devil_jas_size_t iJp2_file_read(
 {
     obj;
     return (devil_jas_size_t)iread(buf, 1, (ILuint)cnt);
-}
+}/*
 #if defined(PRIjas_seqent)
 static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 #else
@@ -358,6 +358,8 @@ static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, int cnt)
     obj;
     return iread(buf, 1, cnt);
 }
+*/
+
 /*
 #if defined(JAS_INCLUDE_JP2_CODEC)
 static int iJp2_file_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt)
